@@ -1,58 +1,61 @@
-import { Oferta } from './shared/oferta.model';
-import { Injectable } from "@angular/core";
-import { Http } from "@angular/http";
+import { map, retry } from 'rxjs/operators';
+import { Http } from '@angular/http'
+import { Injectable } from '@angular/core'
+import { Oferta } from './shared/oferta.model'
+import { URL_API } from './app.api'
 
-import 'rxjs'
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+
+import { Observable} from 'rxjs';
 
 @Injectable()
 export class OfertasService {
 
-    private url_api = 'http://localhost:3000/'
-
+    //private url_api = 'http://localhost:3000/ofertas'
+    
     constructor(private http: Http){}
- 
+    
     public getOfertas(): Promise<Oferta[]> {
-        //efetua requisição http
-        return this.http.get(`${this.url_api}ofertas?destaque=true`)
+        return this.http.get(`${URL_API}/ofertas?destaque=true`)
             .toPromise()
-            .then((resposta: any) => resposta.json())
-        //retorna promise de Oferta[]
+            .then((resposta: any) => { return resposta.json() })
     }
 
-    public getOfertasPorCategoria(catergoria: string) : Promise<Oferta[]>{
-        return this.http.get(`${this.url_api}ofertas?categoria=${catergoria}`)
+    public getOfertasPorCategoria(categoria: string) : Promise<Oferta[]> {
+        return this.http.get(`${URL_API}/ofertas?categoria=${categoria}`)
             .toPromise()
             .then((resposta: any) => resposta.json())
     }
 
     public getOfertaPorId(id: number): Promise<Oferta> {
-        return this.http.get(`${this.url_api}ofertas?id=${id}`)
+        return this.http.get(`${URL_API}/ofertas?id=${id}`)
             .toPromise()
             .then((resposta: any) => {
                 return resposta.json()[0]
             })
     }
 
-    public getComoUsarOfertasPorId(id: number): Promise<string> {
-        return this.http.get(`${this.url_api}como-usar?id=${id}`)
-        .toPromise()
-        .then((resposta: any) => {
-            return resposta.json()[0].descricao
-        })
-    }
-    
-    public getOndeFicaOfertasPorId(id: number): Promise<string> {
-        return this.http.get(`${this.url_api}onde-fica?id=${id}`)
-        .toPromise()
-        .then((resposta: any) => {
-            return resposta.json()[0].descricao
-        })
+    public getComoUsarOfertaPorId(id: number): Promise<string> {
+        return this.http.get(`${URL_API}/como-usar?id=${id}`)
+            .toPromise()
+            .then((resposta: any) => {
+                return resposta.json()[0].descricao
+            })
     }
 
-    public pesquisaOfertas(termo: string) : Observable<Oferta[]> {
-        return this.http.get(`${this.url_api}onde-fica?descricao_oferta_like=${termo}`)
-            .pipe(map((resposta:any) => resposta.json))
-    } 
+    public getOndeFicaOfertaPorId(id: number): Promise<string> {
+        return this.http.get(`${URL_API}/onde-fica?id=${id}`)
+            .toPromise()
+            .then((resposta: any) => {
+                return resposta.json()[0].descricao
+            })
+    }
+
+    public getPesquisaOfertas(termo: string): Observable<Oferta[]> {
+        return this.http.get(`${URL_API}/ofertas?descricao_oferta_like=${termo}`)
+            .pipe(
+                map((resposta: any) => resposta.json()), retry(10)
+            )
+            
+
+    }
 }

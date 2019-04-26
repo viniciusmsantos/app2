@@ -1,7 +1,8 @@
-import { OfertasService } from './../ofertas.service';
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Oferta } from '../shared/oferta.model';
+import { OfertasService } from '../ofertas.service'
+import { Oferta } from '../shared/oferta.model'
+import { Observable, Subject, of } from 'rxjs';
+import { switchMap, debounceTime, distinct, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-topo',
@@ -9,22 +10,42 @@ import { Oferta } from '../shared/oferta.model';
   styleUrls: ['./topo.component.css'],
   providers: [ OfertasService ]
 })
-
 export class TopoComponent implements OnInit {
 
   public ofertas: Observable<Oferta[]>
+  private subjectPesquisa: Subject<string> = new Subject<string>()
 
-  constructor(private ofertasService:OfertasService) { }
+  constructor(private ofertasService: OfertasService) { }
 
   ngOnInit() {
+
+    this.ofertas = this.subjectPesquisa
+    .pipe(debounceTime(1000))
+    .pipe(distinct())
+    .pipe(switchMap((termo : string) => {
+      console.log("requisição http");
+      if(termo.trim() === ''){
+        return of<Oferta[]>([]);
+      }
+      return this.ofertasService.getPesquisaOfertas(termo);
+    }))
+    .pipe(
+      catchError ((erro) => {
+        console.log(erro)
+        return of<Oferta[]>([])
+       })
+    )
+
+  this.ofertas.subscribe((ofertas : Oferta[]) => {
+    console.log(ofertas);
+  })
+
+}
+
+  public pesquisa(termoDaBusca: string): void {
+    console.log('Keyup: ', termoDaBusca);
+    
+    this.subjectPesquisa.next(termoDaBusca)
   }
 
-  public pesquisa(termoDaBusca: string ): void {
-    console.log(termoDaBusca);
-    this.ofertas = this.ofertasService.pesquisaOfertas(termoDaBusca)
-    
-    this.ofertas.subscribe(
-      (ofertas: Oferta[]) => console.log(ofertas)
-    )
-  }
 }

@@ -1,10 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpModule } from "@angular/http";
-import { RouterModule } from "@angular/router";
-import { ROUTES } from "./app.routes";
+import { HttpModule } from '@angular/http'
+import { RouterModule } from '@angular/router'
 
-import { AppRoutingModule } from './app-routing.module';
+import { ROUTES } from './app.routes'
+
 import { AppComponent } from './app.component';
 import { TopoComponent } from './topo/topo.component';
 import { HomeComponent } from './home/home.component';
@@ -29,7 +29,6 @@ import { OndeFicaComponent } from './oferta/onde-fica/onde-fica.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     HttpModule,
     RouterModule.forRoot(ROUTES)
   ],
