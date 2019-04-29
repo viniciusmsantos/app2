@@ -4,16 +4,20 @@
       <div class="row">
         <div class="col-md-4">
           <a class="navbar-brand"  routerLink="">
-            <img class="img-responsive" src="/assets/logo.png" />
+            <img class="img-responsive" style="margin-right: 250px;" src="/assets/logo.png" />
           </a>
         </div>
         <div class="col-md-6">
+          
           <input type="text" 
             class="form-control" 
             placeholder="Pesquise por ofertas..." 
             #termoDaPesquisa
             (keyup)="pesquisa(termoDaPesquisa.value)"
           />
+          <ul class="list-group" style="position: absolute">
+            <li class="list-group-item" *ngFor="let oferta of ofertas2">{{ oferta.titulo }}</li>
+          </ul>
         </div>
         <div class="col-md-2 pull-right">
             <a href="#"><img src="/assets/carrinho.png" /></a>
